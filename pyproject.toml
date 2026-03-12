@@ -1,0 +1,50 @@
+[project]
+name = "exp"
+version = "0.1.0"
+requires-python = ">=3.12"
+description = "Internal domain-driven Python deliverables"
+readme = "README.md"
+license = {text = "Proprietary / Internal"}
+authors = [{name = "Miles"}]
+dependencies = []                                 # add runtime deps here, e.g. ["requests>=2.30"]
+# dynamic = ["version", "dependencies"] if you prefer external files
+
+
+[build-system]
+requires = ["setuptools>=70.0", "wheel"]          # recent version for best pyproject.toml support
+build-backend = "setuptools.build_meta"
+
+
+# ──────────────────────────────────────────────────────────────
+# Package discovery: the main "trick" section
+# ──────────────────────────────────────────────────────────────
+[tool.setuptools.packages.find]
+where = ["."]                                     # start from project root
+include = [
+    "utils",
+    "fine_training",
+    "llama.cpp",
+    "training_dynamics",
+    # Add patterns for every domain package you introduce
+    # Wildcards make it easy to scale (e.g. "feature_*", "legacy_*")
+]
+exclude = [
+    "_*",                                         # ← excludes ALL folders starting with _ (your structural hooks)
+    "bin*",                                       # ← bin/ is scripts, not importable packages
+    "tests*",
+    "docs*",
+    "build*",
+    "dist*",
+    "*.egg-info*",
+    # Add more as needed, e.g. "_deploy*", "experiments*"
+]
+namespaces = false                                # modern default; avoids PEP 420 surprises
+
+# Optional: if you ever have non-code files inside domain packages
+[tool.setuptools.package-data]
+"fine_tuning" = ["*.json", "*.yaml"]                    # example: include config/data files in fine_tuning/
+
+# Optional: entry points (Python-level CLI, can coexist with bin/.sh wrappers)
+[project.scripts]
+tune = "fine_tuning._python.fine_tuning:main"
+judge = "fine_tuning._python.judge_dup:main"
